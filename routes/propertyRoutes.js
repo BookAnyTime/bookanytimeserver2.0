@@ -72,6 +72,17 @@ router.post("/", upload.array("images", 20), parseFormData, async (req, res) => 
   }
 });
 
+router.get("/getall", async (req, res) => {
+  try {
+    const property = await Property.find();
+
+    res.json(property);
+  } catch (error) {
+    console.error("Error fetching property:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 
 // @desc   update the property
 router.put("/:id", upload.array("images", 20), async (req, res) => {
