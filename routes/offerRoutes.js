@@ -19,14 +19,14 @@ const upload = multer({ storage });
 // ✅ 1. Add Offer
 router.post("/add", upload.array("images", 100), async (req, res) => {
   try {
-    const { category, properties, startDate, endDate } = req.body;
+    const { category, properties, startDate, endDate,name } = req.body;
     const propertyList = JSON.parse(properties); // Convert JSON string back to an array
 
-    if (!category || propertyList.length === 0 || !req.files || !startDate || !endDate) {
+    if (!category || propertyList.length === 0 || !req.files || !startDate || !endDate || !name) {
       return res.status(400).json({ message: "All fields are required." });
     }
 
-    const imageUrls = req.files.map((file) => `/uploads/${file.filename}`);
+    const imageUrls = req.files.map((file) => `${process.env.node_Backend_URL}/uploads/${file.filename}`);
 
     const newOffer = new Offer({
       category,
@@ -34,6 +34,7 @@ router.post("/add", upload.array("images", 100), async (req, res) => {
       image: imageUrls,
       startDate,
       endDate,
+      name
     });
 
     await newOffer.save();
@@ -83,7 +84,7 @@ router.delete("/delete/:id", async (req, res) => {
 router.put("/update/:id", upload.array("images"), async (req, res) => {
   try {
     const { id } = req.params;
-    const { category, properties, startDate, endDate, removeImages } = req.body;
+    const { category, properties, startDate, endDate, removeImages,name } = req.body;
 
     console.log("Updating Offer ID:", id);
     console.log("Received Data:", req.body);
@@ -99,7 +100,7 @@ router.put("/update/:id", upload.array("images"), async (req, res) => {
 
     // Add new images if uploaded
     if (req.files && req.files.length > 0) {
-      const newImages = req.files.map((file) => `/uploads/${file.filename}`);
+      const newImages = req.files.map((file) => `${process.env.node_Backend_URL}/uploads/${file.filename}`);
       offer.image = [...offer.image, ...newImages]; // Keep existing images + new images
     }
 
@@ -114,6 +115,7 @@ router.put("/update/:id", upload.array("images"), async (req, res) => {
 
     if (startDate) offer.startDate = startDate;
     if (endDate) offer.endDate = endDate;
+    if (name) offer.name = name;
 
     await offer.save();
     res.status(200).json({ message: "Offer updated successfully", offer });

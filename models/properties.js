@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const propertySchema = new mongoose.Schema(
   {
+    call: { type: String, required: true },
     name: { type: String, required: true },
     category: { type: String, required: true },
     description: { type: String, required: true },
@@ -20,7 +21,8 @@ const propertySchema = new mongoose.Schema(
     popularity: { type: Number },
     images: { type: [String], default: [] },
     whatsappNumber: { type: String, required: true },
-    instagram: { type: String, required: true }
+    instagram: { type: String, required: true },
+    
 
   },
   { collection: "properties_collection" }

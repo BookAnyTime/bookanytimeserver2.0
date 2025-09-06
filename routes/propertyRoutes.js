@@ -40,10 +40,10 @@ const parseFormData = (req, res, next) => {
 // @desc    Add a new property with image upload
 router.post("/", upload.array("images", 20), parseFormData, async (req, res) => {
   try {
-    const { name, category, description,house_rules, minPrice, maxPrice, city, address, latitude, longitude, amenities, capacity, popularity,whatsappNumber , instagram} = req.body;
+    const { name, category, description,house_rules, minPrice, maxPrice, city, address, latitude, longitude, amenities, capacity, popularity,whatsappNumber , instagram,call} = req.body;
 
     // Generate image URLs from uploaded files
-    const imageUrls = req.files.map((file) => `https://api.bookanytime.in:5000/uploads/${file.filename}`);
+    const imageUrls = req.files.map((file) => `${process.env.node_Backend_URL}/uploads/${file.filename}`);
 
     const newProperty = new Property({
       name,
@@ -61,7 +61,8 @@ router.post("/", upload.array("images", 20), parseFormData, async (req, res) => 
       popularity,
       images: imageUrls,
       whatsappNumber,
-      instagram
+      instagram,
+      call
     });
 
     const savedProperty = await newProperty.save();
@@ -89,7 +90,7 @@ router.put("/:id", upload.array("images", 20), async (req, res) => {
   try {
     const propertyId = req.params.id;
     console.log(propertyId)
-    const { name, category, description,house_rules, minPrice, maxPrice, city, address, latitude, longitude, amenities, adults, bedrooms,popularity, whatsappNumber, instagram } = req.body;
+    const { name, category, description,house_rules, minPrice, maxPrice, city, address, latitude, longitude, amenities, adults, bedrooms,popularity, whatsappNumber, instagram,call } = req.body;
     
     // Convert numeric fields
     const updatedData = {
@@ -108,13 +109,14 @@ router.put("/:id", upload.array("images", 20), async (req, res) => {
       bedrooms: Number(bedrooms),
       popularity :Number(popularity),
       whatsappNumber,
-      instagram
+      instagram,
+      call
     };
 
     // Handle image uploads (if new images are provided)
     if (req.files && req.files.length > 0) {
      // const imageUrls = req.files.map(file => `https://api.bookanytime.in:5000/uploads/${file.originalname}`); // Replace with actual cloud storage logic
-      const imageUrls = req.files.map((file) => `https://api.bookanytime.in:5000/uploads/${file.filename}`);
+      const imageUrls = req.files.map((file) => `${process.env.node_Backend_URL}/uploads/${file.filename}`);
       updatedData.images = imageUrls;
     }
 

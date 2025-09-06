@@ -27,7 +27,7 @@ router.post("/", upload.single("image"), async (req, res) => {
           return res.status(400).json({ message: "Category name already exists" });
         }
     
-    const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
+    const imageUrl = req.file ? `${process.env.node_Backend_URL}/uploads/${req.file.filename}` : null;
 
     const newCategory = new Category({ name, image: imageUrl });
     await newCategory.save();
