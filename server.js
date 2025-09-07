@@ -5,6 +5,8 @@ const dotenv = require("dotenv");
 const path = require("path");
 const fs = require("fs");
 const https = require("https");
+const http = require("http");
+
 
 dotenv.config();
 const connectDB = require("./config/db");
@@ -57,8 +59,6 @@ app.get("/api/health", (req, res) => {
 });
 
 
-const http = require("http");
-const https = require("https");
 
 const SELF_URL = process.env.node_Backend_URL+"/api/health"; 
 
