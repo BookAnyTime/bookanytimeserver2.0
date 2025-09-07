@@ -52,6 +52,23 @@ app.use("/api/ratings", require("./routes/ratingsRoutes"));
 app.use("/api/list-property", require("./routes/ListPropertyRoutes"));
 app.use("/api/feedback", require("./routes/feedbackRoutes"));
 
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ status: "OK", timestamp: new Date() });
+});
+
+
+const http = require("http"); // or https if needed
+
+// Self health check every 10 mins (600000 ms)
+setInterval(() => {
+  http.get(`${process.env.node_Backend_URL}/api/health`, (res) => {
+    console.log(`[SELF-CHECK] Health status: ${res.statusCode}`);
+  }).on("error", (err) => {
+    console.error("[SELF-CHECK] Error:", err.message);
+  });
+}, 600000); // 10 minutes
+
+
 // 🔒 Load SSL Certificate & Key from Let's Encrypt
 // const options = {
 //   key: fs.readFileSync("/etc/letsencrypt/live/api.bookanytime.in/privkey.pem"),
