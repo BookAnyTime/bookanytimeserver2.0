@@ -57,16 +57,23 @@ app.get("/api/health", (req, res) => {
 });
 
 
-const http = require("http"); // or https if needed
+const http = require("http");
+const https = require("https");
 
-// Self health check every 10 mins (600000 ms)
+const SELF_URL = process.env.node_Backend_URL+"/api/health"; 
+
 setInterval(() => {
-  http.get(`${process.env.node_Backend_URL}/api/health`, (res) => {
-    console.log(`[SELF-CHECK] Health status: ${res.statusCode}`);
-  }).on("error", (err) => {
-    console.error("[SELF-CHECK] Error:", err.message);
-  });
-}, 600000); // 10 minutes
+  const client = SELF_URL.startsWith("https") ? https : http;
+
+  client
+    .get(SELF_URL, (res) => {
+      console.log(`[SELF-CHECK] ${SELF_URL} -> ${res.statusCode}`);
+    })
+    .on("error", (err) => {
+      console.error("[SELF-CHECK] Error:", err.message);
+    });
+}, 600000); // every 10 min
+
 
 
 // 🔒 Load SSL Certificate & Key from Let's Encrypt
