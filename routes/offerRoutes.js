@@ -16,6 +16,24 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+
+router.get("/active", async (req, res) => {
+  try {
+    const today = new Date();
+
+    const activeOffers = await Offer.find({
+      startDate: { $lte: today }, // started already
+      endDate: { $gte: today },   // not expired
+    });
+
+    res.status(200).json(activeOffers);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+
 // ✅ 1. Add Offer
 router.post("/add", upload.array("images", 100), async (req, res) => {
   try {
