@@ -1,7 +1,7 @@
 const express = require("express");
 const multer = require("multer");
 const Offer = require("../models/Offer");
-
+const mongoose = require("mongoose");
 const router = express.Router();
 
 // Multer Storage Configuration
@@ -160,5 +160,38 @@ router.get("/:id", async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 });
+
+router.get("/by-property/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Validate and convert ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Invalid property ID" });
+    }
+
+    const propId = new mongoose.Types.ObjectId(id);
+    const currentDate = new Date();
+
+    // Find offers that include this property and are currently active
+    const offers = await Offer.find({
+      "properties._id": propId,
+      startDate: { $lte: currentDate }, // Offer already started
+      endDate: { $gte: currentDate },   // Offer not yet ended
+    }).select("_id name");
+
+    // Format offers
+    const formattedOffers = offers.map(o => ({
+      id: o._id,
+      name: o.name,
+    }));
+
+    res.json({ success: true, offers: formattedOffers });
+  } catch (err) {
+    console.error("Error fetching offers:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 
 module.exports = router;
